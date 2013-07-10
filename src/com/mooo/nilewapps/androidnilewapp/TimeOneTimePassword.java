@@ -25,8 +25,18 @@ import javax.crypto.spec.SecretKeySpec;
 import android.util.Base64;
 import android.util.Log;
 
+/**
+ * Provides time synchronised one time password functionality
+ * @author nilewapp
+ *
+ */
 public class TimeOneTimePassword {
     
+    /**
+     * Returns a six digit password based on the current unix time and a secret key
+     * @param secret Base64 encoded secret key
+     * @throws Exception
+     */
     public static String code(byte[] secret) throws Exception {
         /* Init hash algorithm with secret */
         Mac mac = Mac.getInstance("HmacSHA1");
