@@ -16,9 +16,14 @@
 package com.mooo.nilewapps.androidnilewapp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -44,7 +49,17 @@ import org.apache.http.params.HttpParams;
  */
 public class HttpPostString {
     
-    public static String request(HttpClient client, String url, List<NameValuePair> params) throws Exception {
+    /**
+     * Performs an HTTP post request
+     * @param client
+     * @param url
+     * @param params
+     * @return the response body of the request
+     * @throws IllegalStateException
+     * @throws IOException
+     */
+    public static String request(HttpClient client, String url, List<NameValuePair> params) 
+            throws IllegalStateException, IOException {
         HttpPost request = new HttpPost(url);
         request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
         HttpResponse response = client.execute(request);
@@ -65,14 +80,26 @@ public class HttpPostString {
     }
 
     /**
-     * Performs post request
+     * Performs an HTTP post request
      * @param trustStore contains a local certificate
      * @param url
      * @param requestEntity http post request parameters
-     * @return the response body of the get request
+     * @return the response body of the post request
+     * @throws KeyStoreException 
+     * @throws NoSuchAlgorithmException 
+     * @throws UnrecoverableKeyException 
+     * @throws KeyManagementException 
+     * @throws IOException 
+     * @throws IllegalStateException 
      * @throws Exception
      */
-    public static String request(KeyStore trustStore, String url, List<NameValuePair> requestEntity) throws Exception {
+    public static String request(KeyStore trustStore, String url, List<NameValuePair> requestEntity) 
+            throws KeyManagementException, 
+                   UnrecoverableKeyException, 
+                   NoSuchAlgorithmException, 
+                   KeyStoreException, 
+                   IllegalStateException, 
+                   IOException {
         
         /* Register trust store */
         SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -88,13 +115,16 @@ public class HttpPostString {
     }
     
     /**
-     * Performs post request
+     * Performs an HTTP post request
      * @param url
      * @param params http post request params
-     * @return the response body of the get request
+     * @return the response body of the post request
+     * @throws IOException 
+     * @throws IllegalStateException 
      * @throws Exception
      */
-    public static String request(String url, List<NameValuePair> params) throws Exception {
+    public static String request(String url, List<NameValuePair> params) 
+            throws IllegalStateException, IOException {
         HttpClient client = new DefaultHttpClient();
         return request(client, url, params);
     }

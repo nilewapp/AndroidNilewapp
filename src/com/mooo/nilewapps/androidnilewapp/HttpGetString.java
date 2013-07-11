@@ -16,11 +16,17 @@
 package com.mooo.nilewapps.androidnilewapp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ClientConnectionManager;
@@ -41,7 +47,16 @@ import org.apache.http.params.HttpParams;
  */
 public class HttpGetString {
     
-    public static String request(HttpClient client, String url) throws Exception {
+    /**
+     * Performs an HTTP get request
+     * @param client
+     * @param url
+     * @return the response body of the get request
+     * @throws ClientProtocolException
+     * @throws IOException
+     */
+    public static String request(HttpClient client, String url)
+            throws ClientProtocolException, IOException {
         HttpGet request = new HttpGet(url);
         HttpResponse response = client.execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
@@ -61,13 +76,25 @@ public class HttpGetString {
     }
 
     /**
-     * Performs get request
+     * Performs an HTTP get request
      * @param trustStore contains a local certificate
      * @param url
      * @return the response body of the get request
+     * @throws KeyStoreException 
+     * @throws NoSuchAlgorithmException 
+     * @throws UnrecoverableKeyException 
+     * @throws KeyManagementException 
+     * @throws IOException 
+     * @throws ClientProtocolException 
      * @throws Exception
      */
-    public static String request(KeyStore trustStore, String url) throws Exception {
+    public static String request(KeyStore trustStore, String url)
+            throws KeyManagementException, 
+                   UnrecoverableKeyException, 
+                   NoSuchAlgorithmException, 
+                   KeyStoreException, 
+                   ClientProtocolException,
+                   IOException {
         
         /* Register trust store */
         SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -83,12 +110,15 @@ public class HttpGetString {
     }
     
     /**
-     * Performs get request
+     * Performs an HTTP get request
      * @param url
      * @return the response body of the get request
+     * @throws IOException 
+     * @throws ClientProtocolException 
      * @throws Exception
      */
-    public static String request(String url) throws Exception {
+    public static String request(String url) 
+            throws ClientProtocolException, IOException {
         HttpClient client = new DefaultHttpClient();
         return request(client, url);
     }

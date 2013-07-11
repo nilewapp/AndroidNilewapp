@@ -26,15 +26,15 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 
-public class PreferenceUtil {
+public class Preferences {
 
     /**
-     * Stores a preference with a key stored in a resource
+     * Stores a preference with a key stored in a resource.
      * @param activity
      * @param id resource id that corresponds to the preference key
      * @param value new value
      */
-    public static void storePreference(Activity activity, int id, String value) {
+    public static void put(Activity activity, int id, String value) {
         final String resKey = activity.getString(id);
         
         activity.getPreferences(Context.MODE_PRIVATE)
@@ -44,15 +44,26 @@ public class PreferenceUtil {
     }
     
     /**
-     * Gets a preference string from a key stored in a resource
+     * Gets a preference string from a key stored in a resource.
      * @param activity
      * @param id resource id that corresponds to the preference key
      * @param defValue return value if there is no preference with the given key
      * @return
      */
-    public static String getPreference(Activity activity, int id, String defValue) {
+    public static String get(Activity activity, int id, String defValue) {
         final String resValue = activity.getString(id);
         return activity.getPreferences(Context.MODE_PRIVATE).getString(resValue, defValue);
+    }
+    
+    /**
+     * Gets a preference string from a key stored in a resource, returns
+     * null if the preference isn't found.
+     * @param activity
+     * @param id resource id that corresponds to the preference key
+     * @return
+     */
+    public static String get(Activity activity, int id) {
+        return get(activity, id, null);
     }
     
     public static void storeBitmap(Context context, Bitmap bitmap, String filename)

@@ -23,52 +23,44 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import android.util.Base64;
-import android.util.Log;
 
 /**
  * Provides time synchronised one time password functionality
  * @author nilewapp
  *
  */
-public class TimeOneTimePassword {
+public class TimeOTP {
     
     /**
      * Returns a six digit password based on the current unix time and a secret key
      * @param secret Base64 encoded secret key
      * @throws Exception
      */
-    public static String code(byte[] secret) throws Exception {
+    public static String generate(byte[] secret) throws Exception {
         /* Init hash algorithm with secret */
         Mac mac = Mac.getInstance("HmacSHA1");
         byte[] key = Base64.decode(secret, Base64.DEFAULT);
-        Log.d("TimeOneTimePassword", "Secret: " + new String(secret) + ", key: " + new String(key));
         
         SecretKeySpec keySpec = new SecretKeySpec(key, mac.getAlgorithm());
         mac.init(keySpec);
 
         /* Get current unix timestamp truncated to the nearest 30 seconds */
         Long message = System.currentTimeMillis() / 30000L;
-        Log.d("TimeOneTimePassword", "Message: " + message);
         
         /* Hash message */
         byte[] hash = mac.doFinal(message.toString().getBytes());
-        Log.d("TimeOneTimePassword", "Hash: '" + new String(hash) + "'");
         
         /* Get the last four bits of the hash */
         int offset = 0xF & hash[hash.length - 1];
-        Log.d("TimeOneTimePassword", "Offset: " + offset);
         
         /* Get four bytes from the hash starting from the offset */
         byte[] truncatedHash = Arrays.copyOfRange(hash, offset, offset + 4);
-        Log.d("TimeOneTimePassword", "Truncated hash: '" + new String(truncatedHash) + "'");
-        
-        /* Clear the most significant bit */
-        truncatedHash[0] &= 0x7F;
-        Log.d("TimeOneTimePassword", "Cleared top bit: '" + new String(truncatedHash) + "'");
         
         ByteBuffer wrapper = ByteBuffer.wrap(truncatedHash);
-        int code = wrapper.getInt() % 1000000;
+        int code = wrapper.getInt() & 0x7FFFFFFF % 1000000;
         
         return String.format(Locale.US, "%06d", code);
     }
+    
+
 }
