@@ -16,6 +16,8 @@
 package com.mooo.nilewapps.androidnilewapp;
 
 import java.nio.ByteBuffer;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -25,18 +27,35 @@ import javax.crypto.spec.SecretKeySpec;
 import android.util.Base64;
 
 /**
- * Provides time synchronised one time password functionality
+ * Provides time synchronised one time password functionality.
  * @author nilewapp
  *
  */
 public class TimeOTP {
     
     /**
-     * Returns a six digit password based on the current unix time and a secret key
+     * Returns a six digit password based on the current unix time truncated to
+     * the last 30 seconds and a secret key.
      * @param secret Base64 encoded secret key
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
      * @throws Exception
      */
-    public static String generate(byte[] secret) throws Exception {
+    public static String generate(byte[] secret)
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        return generate(secret, 30);
+    }
+
+    /**
+     * Returns a six digit password based on the current unix time and a secret key.
+     * @param secret Base64 encoded secret key
+     * @param seconds time interval between different passwords being generated
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     */
+    public static String generate(byte[] secret, long seconds)
+            throws NoSuchAlgorithmException, InvalidKeyException {
         /* Init hash algorithm with secret */
         Mac mac = Mac.getInstance("HmacSHA1");
         byte[] key = Base64.decode(secret, Base64.DEFAULT);
@@ -45,7 +64,7 @@ public class TimeOTP {
         mac.init(keySpec);
 
         /* Get current unix timestamp truncated to the nearest 30 seconds */
-        Long message = System.currentTimeMillis() / 30000L;
+        Long message = System.currentTimeMillis() / (seconds * 1000L);
         
         /* Hash message */
         byte[] hash = mac.doFinal(message.toString().getBytes());
@@ -61,6 +80,4 @@ public class TimeOTP {
         
         return String.format(Locale.US, "%06d", code);
     }
-    
-
 }

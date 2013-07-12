@@ -41,6 +41,8 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
+import android.util.Base64;
+
 /**
  * Helper class that performs http post requests and returns
  * the response as a string
@@ -48,20 +50,19 @@ import org.apache.http.params.HttpParams;
  *
  */
 public class HttpPostString {
-    
+
     /**
-     * Performs an HTTP post request
+     * Performs an HTTP post request.
      * @param client
-     * @param url
-     * @param params
-     * @return the response body of the request
+     * @param request
+     * @param requestEntity
+     * @return
      * @throws IllegalStateException
      * @throws IOException
      */
-    public static String request(HttpClient client, String url, List<NameValuePair> params) 
+    public static String request(HttpClient client, HttpPost request, List<NameValuePair> requestEntity)
             throws IllegalStateException, IOException {
-        HttpPost request = new HttpPost(url);
-        request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+        request.setEntity(new UrlEncodedFormEntity(requestEntity, "UTF-8"));
         HttpResponse response = client.execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == HttpURLConnection.HTTP_OK) {
@@ -76,11 +77,25 @@ public class HttpPostString {
             return sb.toString();
         }
         return null;
-        
     }
 
     /**
-     * Performs an HTTP post request
+     * Performs a basic HTTP post request.
+     * @param client
+     * @param url
+     * @param requestEntity
+     * @return the response body of the request
+     * @throws IllegalStateException
+     * @throws IOException
+     */
+    public static String request(HttpClient client, String url, List<NameValuePair> requestEntity)
+            throws IllegalStateException, IOException {
+        HttpPost request = new HttpPost(url);
+        return request(client, request, requestEntity);
+    }
+
+    /**
+     * Performs an HTTP post request.
      * @param trustStore contains a local certificate
      * @param url
      * @param requestEntity http post request parameters
@@ -93,14 +108,24 @@ public class HttpPostString {
      * @throws IllegalStateException 
      * @throws Exception
      */
-    public static String request(KeyStore trustStore, String url, List<NameValuePair> requestEntity) 
-            throws KeyManagementException, 
-                   UnrecoverableKeyException, 
-                   NoSuchAlgorithmException, 
-                   KeyStoreException, 
-                   IllegalStateException, 
+    public static String request(KeyStore trustStore, String url, List<NameValuePair> requestEntity)
+            throws KeyManagementException,
+                   UnrecoverableKeyException,
+                   NoSuchAlgorithmException,
+                   KeyStoreException,
+                   IllegalStateException,
                    IOException {
-        
+        return request(trustStore, new HttpPost(url), requestEntity);
+    }
+
+    public static String request(KeyStore trustStore, HttpPost request, List<NameValuePair> requestEntity)
+            throws KeyManagementException,
+                UnrecoverableKeyException,
+                NoSuchAlgorithmException,
+                KeyStoreException,
+                IllegalStateException,
+                IOException {
+
         /* Register trust store */
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 8080));
@@ -111,11 +136,11 @@ public class HttpPostString {
         
         /* Perform http request */
         HttpClient client = new DefaultHttpClient(cm, params);
-        return request(client, url, requestEntity);
+        return request(client, request, requestEntity);
     }
     
     /**
-     * Performs an HTTP post request
+     * Performs an HTTP post request.
      * @param url
      * @param params http post request params
      * @return the response body of the post request
@@ -123,9 +148,38 @@ public class HttpPostString {
      * @throws IllegalStateException 
      * @throws Exception
      */
-    public static String request(String url, List<NameValuePair> params) 
+    public static String request(String url, List<NameValuePair> params)
             throws IllegalStateException, IOException {
         HttpClient client = new DefaultHttpClient();
         return request(client, url, params);
+    }
+
+    /**
+     * Performs an HTTP post request. Sets the Authorization header.
+     * @param trustStore
+     * @param url
+     * @param username
+     * @param password
+     * @param requestEntity
+     * @return
+     * @throws KeyManagementException
+     * @throws UnrecoverableKeyException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IllegalStateException
+     * @throws IOException
+     */
+    public static String request(KeyStore trustStore, String url, String username, String password, List<NameValuePair> requestEntity)
+            throws KeyManagementException,
+                UnrecoverableKeyException,
+                NoSuchAlgorithmException,
+                KeyStoreException,
+                IllegalStateException,
+                IOException {
+        HttpPost request = new HttpPost(url);
+        String credentials = username + ":" + password;
+        String header = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.URL_SAFE|Base64.NO_WRAP);
+        request.setHeader("Authorization", header);
+        return request(trustStore, request, requestEntity);
     }
 }
