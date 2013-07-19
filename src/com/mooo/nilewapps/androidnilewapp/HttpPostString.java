@@ -40,6 +40,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HTTP;
 
 import android.util.Base64;
 
@@ -50,7 +51,7 @@ import android.util.Base64;
  *
  */
 public class HttpPostString {
-
+    
     /**
      * Performs an HTTP post request.
      * @param client
@@ -61,22 +62,23 @@ public class HttpPostString {
      * @throws IOException
      */
     public static String request(HttpClient client, HttpPost request, List<NameValuePair> requestEntity)
-            throws IllegalStateException, IOException {
-        request.setEntity(new UrlEncodedFormEntity(requestEntity, "UTF-8"));
+            throws IllegalStateException, IOException, HttpException {
+        request.setEntity(new UrlEncodedFormEntity(requestEntity, HTTP.UTF_8));
         HttpResponse response = client.execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(
-                            response.getEntity().getContent(), "UTF-8"), 8);
+                            response.getEntity().getContent(), HTTP.UTF_8), 8);
             StringBuilder sb = new StringBuilder();
             String line = null;
             while ((line = in.readLine()) != null) {
                 sb.append(line + "\n");
             }
             return sb.toString();
+        } else {
+            throw new HttpException(request, response);
         }
-        return null;
     }
 
     /**
@@ -87,9 +89,10 @@ public class HttpPostString {
      * @return the response body of the request
      * @throws IllegalStateException
      * @throws IOException
+     * @throws HttpException 
      */
     public static String request(HttpClient client, String url, List<NameValuePair> requestEntity)
-            throws IllegalStateException, IOException {
+            throws IllegalStateException, IOException, HttpException {
         HttpPost request = new HttpPost(url);
         return request(client, request, requestEntity);
     }
@@ -106,6 +109,7 @@ public class HttpPostString {
      * @throws KeyManagementException 
      * @throws IOException 
      * @throws IllegalStateException 
+     * @throws HttpException 
      * @throws Exception
      */
     public static String request(KeyStore trustStore, String url, List<NameValuePair> requestEntity)
@@ -114,7 +118,8 @@ public class HttpPostString {
                    NoSuchAlgorithmException,
                    KeyStoreException,
                    IllegalStateException,
-                   IOException {
+                   IOException,
+                   HttpException {
         return request(trustStore, new HttpPost(url), requestEntity);
     }
 
@@ -124,7 +129,7 @@ public class HttpPostString {
                 NoSuchAlgorithmException,
                 KeyStoreException,
                 IllegalStateException,
-                IOException {
+                IOException, HttpException {
 
         /* Register trust store */
         SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -146,10 +151,11 @@ public class HttpPostString {
      * @return the response body of the post request
      * @throws IOException 
      * @throws IllegalStateException 
+     * @throws HttpException 
      * @throws Exception
      */
     public static String request(String url, List<NameValuePair> params)
-            throws IllegalStateException, IOException {
+            throws IllegalStateException, IOException, HttpException {
         HttpClient client = new DefaultHttpClient();
         return request(client, url, params);
     }
@@ -168,6 +174,7 @@ public class HttpPostString {
      * @throws KeyStoreException
      * @throws IllegalStateException
      * @throws IOException
+     * @throws HttpException 
      */
     public static String request(KeyStore trustStore, String url, String username, String password, List<NameValuePair> requestEntity)
             throws KeyManagementException,
@@ -175,7 +182,8 @@ public class HttpPostString {
                 NoSuchAlgorithmException,
                 KeyStoreException,
                 IllegalStateException,
-                IOException {
+                IOException,
+                HttpException {
         HttpPost request = new HttpPost(url);
         String credentials = username + ":" + password;
         String header = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.URL_SAFE|Base64.NO_WRAP);
