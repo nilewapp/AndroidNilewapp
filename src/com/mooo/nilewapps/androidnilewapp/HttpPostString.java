@@ -61,7 +61,7 @@ public class HttpPostString {
      * @throws IllegalStateException
      * @throws IOException
      */
-    public static String request(HttpClient client, HttpPost request, List<NameValuePair> requestEntity)
+    public static <T extends NameValuePair> String request(HttpClient client, HttpPost request, List<T> requestEntity)
             throws IllegalStateException, IOException, HttpException {
         request.setEntity(new UrlEncodedFormEntity(requestEntity, HTTP.UTF_8));
         HttpResponse response = client.execute(request);
@@ -91,7 +91,7 @@ public class HttpPostString {
      * @throws IOException
      * @throws HttpException 
      */
-    public static String request(HttpClient client, String url, List<NameValuePair> requestEntity)
+    public static <T extends NameValuePair> String request(HttpClient client, String url, List<T> requestEntity)
             throws IllegalStateException, IOException, HttpException {
         HttpPost request = new HttpPost(url);
         return request(client, request, requestEntity);
@@ -112,7 +112,7 @@ public class HttpPostString {
      * @throws HttpException 
      * @throws Exception
      */
-    public static String request(KeyStore trustStore, String url, List<NameValuePair> requestEntity)
+    public static <T extends NameValuePair> String request(KeyStore trustStore, String url, List<T> requestEntity)
             throws KeyManagementException,
                    UnrecoverableKeyException,
                    NoSuchAlgorithmException,
@@ -123,7 +123,7 @@ public class HttpPostString {
         return request(trustStore, new HttpPost(url), requestEntity);
     }
 
-    public static String request(KeyStore trustStore, HttpPost request, List<NameValuePair> requestEntity)
+    public static <T extends NameValuePair> String request(KeyStore trustStore, HttpPost request, List<T> requestEntity)
             throws KeyManagementException,
                 UnrecoverableKeyException,
                 NoSuchAlgorithmException,
@@ -154,7 +154,7 @@ public class HttpPostString {
      * @throws HttpException 
      * @throws Exception
      */
-    public static String request(String url, List<NameValuePair> params)
+    public static <T extends NameValuePair> String request(String url, List<T> params)
             throws IllegalStateException, IOException, HttpException {
         HttpClient client = new DefaultHttpClient();
         return request(client, url, params);
@@ -176,7 +176,7 @@ public class HttpPostString {
      * @throws IOException
      * @throws HttpException 
      */
-    public static String request(KeyStore trustStore, String url, String username, String password, List<NameValuePair> requestEntity)
+    public static <T extends NameValuePair> String request(KeyStore trustStore, String url, String username, String password, List<T> requestEntity)
             throws KeyManagementException,
                 UnrecoverableKeyException,
                 NoSuchAlgorithmException,
