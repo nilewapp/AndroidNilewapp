@@ -63,7 +63,7 @@ public class HttpGetString {
         if (statusCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(
-                            response.getEntity().getContent(), "UTF-8"), 8);
+                            response.getEntity().getContent()), 8);
             StringBuilder sb = new StringBuilder();
             String line = null;
             while ((line = in.readLine()) != null) {

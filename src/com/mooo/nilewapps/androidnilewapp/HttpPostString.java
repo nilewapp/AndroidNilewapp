@@ -40,7 +40,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
 
 import android.util.Base64;
 
@@ -63,13 +62,13 @@ public class HttpPostString {
      */
     public static <T extends NameValuePair> String request(HttpClient client, HttpPost request, List<T> requestEntity)
             throws IllegalStateException, IOException, HttpException {
-        request.setEntity(new UrlEncodedFormEntity(requestEntity, HTTP.UTF_8));
+        request.setEntity(new UrlEncodedFormEntity(requestEntity));
         HttpResponse response = client.execute(request);
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(
-                            response.getEntity().getContent(), HTTP.UTF_8), 8);
+                            response.getEntity().getContent()), 8);
             StringBuilder sb = new StringBuilder();
             String line = null;
             while ((line = in.readLine()) != null) {
