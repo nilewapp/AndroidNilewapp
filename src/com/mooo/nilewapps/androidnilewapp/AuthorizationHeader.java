@@ -16,19 +16,22 @@
 package com.mooo.nilewapps.androidnilewapp;
 
 /**
- * Defines the structure of a http Authorization header
+ * Defines the structure of a http Authorization header.
  * @author nilewapp
  *
  */
 public class AuthorizationHeader {
+    
     private final String scheme;
-    private final String data;
-    public AuthorizationHeader(String scheme, String data) {
+    private final String credentials;
+    
+    public AuthorizationHeader(String scheme, String credentials) {
         this.scheme = scheme;
-        this.data = data;
+        this.credentials = credentials;
     }
+    
     @Override
     public String toString() {
-        return scheme + " " + data;
+        return scheme + " " + credentials;
     }
 }
