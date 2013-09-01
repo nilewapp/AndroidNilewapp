@@ -158,6 +158,52 @@ public class HttpPostString {
         HttpClient client = new DefaultHttpClient();
         return request(client, url, params);
     }
+    
+    /**
+     * Performs an HTTP post request with a given Authorization header.
+     * @param trustStore
+     * @param url
+     * @param authorizationHeader
+     * @param requestEntity
+     * @return
+     * @throws KeyManagementException
+     * @throws UnrecoverableKeyException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IllegalStateException
+     * @throws IOException
+     * @throws HttpException
+     */
+    public static <T extends NameValuePair> String request(KeyStore trustStore, String url, AuthorizationHeader authorizationHeader, List<T> requestEntity)
+            throws KeyManagementException,
+                UnrecoverableKeyException,
+                NoSuchAlgorithmException,
+                KeyStoreException,
+                IllegalStateException,
+                IOException,
+                HttpException {
+        HttpPost request = new HttpPost(url);
+        request.setHeader("Authorization", authorizationHeader.toString());
+        return request(trustStore, request, requestEntity);
+    }
+    
+    /**
+     * Defines the structure of a http Authorization header
+     * @author nilewapp
+     *
+     */
+    public class AuthorizationHeader {
+        private final String scheme;
+        private final String data;
+        public AuthorizationHeader(String scheme, String data) {
+            this.scheme = scheme;
+            this.data = data;
+        }
+        @Override
+        public String toString() {
+            return scheme + " " + Base64.encodeToString(data.getBytes(), Base64.URL_SAFE|Base64.NO_WRAP);
+        }
+    }
 
     /**
      * Performs an HTTP post request. Sets the Authorization header.
@@ -189,4 +235,5 @@ public class HttpPostString {
         request.setHeader("Authorization", header);
         return request(trustStore, request, requestEntity);
     }
+    
 }
