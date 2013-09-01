@@ -174,7 +174,11 @@ public class HttpPostString {
      * @throws IOException
      * @throws HttpException
      */
-    public static <T extends NameValuePair> String request(KeyStore trustStore, String url, AuthorizationHeader authorizationHeader, List<T> requestEntity)
+    public static <T extends NameValuePair> String request(
+                KeyStore trustStore, 
+                String url, 
+                AuthorizationHeader authorizationHeader, 
+                List<T> requestEntity)
             throws KeyManagementException,
                 UnrecoverableKeyException,
                 NoSuchAlgorithmException,
@@ -188,25 +192,8 @@ public class HttpPostString {
     }
     
     /**
-     * Defines the structure of a http Authorization header
-     * @author nilewapp
-     *
-     */
-    public class AuthorizationHeader {
-        private final String scheme;
-        private final String data;
-        public AuthorizationHeader(String scheme, String data) {
-            this.scheme = scheme;
-            this.data = data;
-        }
-        @Override
-        public String toString() {
-            return scheme + " " + Base64.encodeToString(data.getBytes(), Base64.URL_SAFE|Base64.NO_WRAP);
-        }
-    }
-
-    /**
-     * Performs an HTTP post request. Sets the Authorization header.
+     * Performs an HTTP post request. Sets the Authorization header with 
+     * the Basic authentication scheme.
      * @param trustStore
      * @param url
      * @param username
@@ -221,7 +208,12 @@ public class HttpPostString {
      * @throws IOException
      * @throws HttpException 
      */
-    public static <T extends NameValuePair> String request(KeyStore trustStore, String url, String username, String password, List<T> requestEntity)
+    public static <T extends NameValuePair> String request(
+                KeyStore trustStore, 
+                String url, 
+                String username, 
+                String password, 
+                List<T> requestEntity)
             throws KeyManagementException,
                 UnrecoverableKeyException,
                 NoSuchAlgorithmException,
@@ -229,11 +221,13 @@ public class HttpPostString {
                 IllegalStateException,
                 IOException,
                 HttpException {
-        HttpPost request = new HttpPost(url);
         String credentials = username + ":" + password;
-        String header = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.URL_SAFE|Base64.NO_WRAP);
-        request.setHeader("Authorization", header);
-        return request(trustStore, request, requestEntity);
+        AuthorizationHeader auth = 
+                new AuthorizationHeader("Basic", 
+                        Base64.encodeToString(
+                                credentials.getBytes(),
+                                Base64.URL_SAFE|Base64.NO_WRAP)); 
+        return request(trustStore, url, auth, requestEntity);
     }
     
 }
