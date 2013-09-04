@@ -94,6 +94,7 @@ public class FilterableListDialogFragment extends DialogFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     listener.onDialogItemClick(adapter.getItem(which));
+                    dialog.dismiss();
                 }
             });
         
