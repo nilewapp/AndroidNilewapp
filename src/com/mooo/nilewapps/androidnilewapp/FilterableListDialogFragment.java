@@ -85,18 +85,17 @@ public class FilterableListDialogFragment extends DialogFragment {
                     android.R.layout.simple_list_item_1);
         
         /* Set up the search field for filtering */
-        filterText = (EditText) layout.findViewById(R.id.dialog_filterable_list_filter_text);
+        filterText = (EditText) layout.findViewById(R.id.filter_text);
         filterText.addTextChangedListener(filterTextWatcher);
         
         /* Create the dialog */
         builder.setView(layout)
-            .setAdapter(adapter, 
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        listener.onDialogItemClick(adapter.getItem(which));
-                    }
-                });
+            .setSingleChoiceItems(adapter, STYLE_NORMAL, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    listener.onDialogItemClick(adapter.getItem(which));
+                }
+            });
         
         final Dialog dialog = builder.create();
         
@@ -129,7 +128,7 @@ public class FilterableListDialogFragment extends DialogFragment {
     }
     
     /**
-     * Set the contents of the dialog
+     * Set the contents of the dialog.
      * @param items content list
      */
     public void setData(List<String> items) {
