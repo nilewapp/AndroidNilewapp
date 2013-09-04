@@ -44,7 +44,7 @@ import org.apache.http.params.HttpParams;
 import android.util.Base64;
 
 /**
- * Helper class that performs http post requests and returns
+ * Helper class that performs HTTP post requests and returns
  * the response as a string
  * @author nilewapp
  *
@@ -122,6 +122,20 @@ public class HttpPostString {
         return request(trustStore, new HttpPost(url), requestEntity);
     }
 
+    /**
+     * Registers a truststore and performs an HTTP post request.
+     * @param trustStore
+     * @param request
+     * @param requestEntity
+     * @return
+     * @throws KeyManagementException
+     * @throws UnrecoverableKeyException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws IllegalStateException
+     * @throws IOException
+     * @throws HttpException
+     */
     public static <T extends NameValuePair> String request(KeyStore trustStore, HttpPost request, List<T> requestEntity)
             throws KeyManagementException,
                 UnrecoverableKeyException,
